@@ -1,6 +1,0 @@
-D:\git\2KinectTechDemo\2Kinects1Machine\bin\x86\Debug\2Kinects1Machine.exe
-D:\git\2KinectTechDemo\2Kinects1Machine\bin\x86\Debug\2Kinects1Machine.pdb
-D:\git\2KinectTechDemo\2Kinects1Machine\obj\x86\Debug\ResolveAssemblyReference.cache
-D:\git\2KinectTechDemo\2Kinects1Machine\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
-D:\git\2KinectTechDemo\2Kinects1Machine\obj\x86\Debug\2Kinects1Machine.exe
-D:\git\2KinectTechDemo\2Kinects1Machine\obj\x86\Debug\2Kinects1Machine.pdb
