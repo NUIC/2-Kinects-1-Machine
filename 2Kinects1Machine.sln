@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2Kinects1Machine", "2Kinects1Machine\2Kinects1Machine\2Kinects1Machine.csproj", "{C1D9FFB3-BF87-4835-B215-615D40A92CA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2Kinects1Machine", "2Kinects1Machine\2Kinects1Machine.csproj", "{C1D9FFB3-BF87-4835-B215-615D40A92CA8}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "2Kinects1MachineContent", "2Kinects1Machine\2Kinects1MachineContent\2Kinects1MachineContent.contentproj", "{713D33E7-C250-477A-80BA-68E4F051638B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2Kinects1MachineContent", "2Kinects1MachineContent\2Kinects1MachineContent.contentproj", "{713D33E7-C250-477A-80BA-68E4F051638B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
