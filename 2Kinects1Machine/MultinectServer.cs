@@ -35,23 +35,8 @@ namespace _2Kinects1Machine
             graphics = new GraphicsDeviceManager(this);
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
+        protected void pipeFromClient(Object kinect)
         {
-            kinectClient1 = new Process();
-            kinectClient2 = new Process();
-
-            //DEBUG: Rename once Client Class is handled.
-            kinectClient1.StartInfo.FileName = "pipeClient.exe";
-            kinectClient2.StartInfo.FileName = "pipeClient.exe";
-
-            
-            //start threading here
             using (AnonymousPipeServerStream pipeServer =
                 new AnonymousPipeServerStream(PipeDirection.In,
                 HandleInheritability.Inheritable))
@@ -85,8 +70,29 @@ namespace _2Kinects1Machine
                     Console.WriteLine("[SERVER] Error: {0}", e.Message);
                 }
             }
-            //stop threading here
+        }
 
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
+        protected override void Initialize()
+        {
+            kinectClient1 = new Process();
+            kinectClient2 = new Process();
+
+            //DEBUG: Rename once Client Class is handled.
+            kinectClient1.StartInfo.FileName = "pipeClient.exe";
+            kinectClient2.StartInfo.FileName = "pipeClient.exe";
+
+
+            Thread KinectThread1 = new Thread(new ParameterizedThreadStart(pipeFromClient));
+            Thread KinectThread2 = new Thread(new ParameterizedThreadStart(pipeFromClient));
+
+            KinectThread1.Start(kinectClient1);
+            KinectThread2.Start(kinectClient2);
 
 
             base.Initialize();
