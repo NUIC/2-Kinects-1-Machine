@@ -35,6 +35,10 @@ namespace _2Kinects1Machine
             graphics = new GraphicsDeviceManager(this);
         }
 
+        /// <summary>
+        /// Recieves input from the client processes, 
+        /// and then does stuff with it.
+        /// </summary>
         protected void pipeFromClient(Object kinect)
         {
             using (AnonymousPipeServerStream pipeServer =
@@ -80,17 +84,20 @@ namespace _2Kinects1Machine
         /// </summary>
         protected override void Initialize()
         {
+            //initialize process variables
             kinectClient1 = new Process();
             kinectClient2 = new Process();
 
             //DEBUG: Rename once Client Class is handled.
+            //run the client process
             kinectClient1.StartInfo.FileName = "pipeClient.exe";
             kinectClient2.StartInfo.FileName = "pipeClient.exe";
 
-
+            //Make new threads to support pipes between the servers and clients
             Thread KinectThread1 = new Thread(new ParameterizedThreadStart(pipeFromClient));
             Thread KinectThread2 = new Thread(new ParameterizedThreadStart(pipeFromClient));
 
+            //Start the pipe thread with the kinect processes
             KinectThread1.Start(kinectClient1);
             KinectThread2.Start(kinectClient2);
 
