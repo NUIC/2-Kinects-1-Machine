@@ -1,1 +1,2 @@
 D:\git\2KinectTechDemo\2Kinects1MachineContent\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Evan\2-Kinects-1-Machine\2Kinects1MachineContent\obj\x86\Debug\ResolveAssemblyReference.cache
