@@ -16,6 +16,7 @@ namespace KinectClient
 #if (DEBUG)
             if (args.Length == 0)
             {
+
                 
                 SetupParentProcess();
             }

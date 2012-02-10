@@ -68,8 +68,6 @@ namespace _2Kinects1Machine
             //Thread KinectThread2 = new Thread(new ParameterizedThreadStart(pipeFromClient));
 
             //Start the pipe thread with the kinect processes
-            //KinectThread1.Start(kinectClient1);
-            //KinectThread2.Start(kinectClient2);
             KinectThread1.Start();
 
 

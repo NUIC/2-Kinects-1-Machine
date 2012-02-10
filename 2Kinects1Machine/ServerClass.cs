@@ -40,18 +40,23 @@ namespace _2Kinects1Machine
                 // Read user input and send that to the client process.
                 using (StreamReader sr = new StreamReader(pipeServer))
                 {
-                    //sr.AutoFlush = true;
-                    // Send a 'sync message' and wait for client to receive it.
-                    //sr.WriteLine("SYNC");
-                    //pipeServer.WaitForPipeDrain();
-                    // Send the console input to the client process.
-                    //Console.Write("[SERVER] Enter text: ");
-                    //sr.WriteLine(Console.ReadLine());
-                    string temp;
+                    char temp;
+                    string message = "";
+                    Console.WriteLine("[Server] Waiting for input");
 
-                    while((temp = sr.ReadLine()) != null)
+                    while (pipeServer.IsConnected)
                     {
-                        Console.WriteLine("[Server] Echo: {0} ", temp); 
+                        temp = (char)sr.Read();
+
+                        if (temp != (char)13)
+                        {
+                            message += temp;
+                        }
+                        else
+                        {
+                            Console.WriteLine("[Server] Echo: {0} ", message);
+                            message = "";
+                        }
                     }
                 }
             }

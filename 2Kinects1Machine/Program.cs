@@ -18,4 +18,3 @@ namespace _2Kinects1Machine
     }
 #endif
 }
-
