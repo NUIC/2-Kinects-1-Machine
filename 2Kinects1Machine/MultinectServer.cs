@@ -39,41 +39,9 @@ namespace _2Kinects1Machine
         /// Recieves input from the client processes, 
         /// and then does stuff with it.
         /// </summary>
-        protected void pipeFromClient(Object kinect)
+        protected void pipeFromClient(Process kinect)
         {
-            using (AnonymousPipeServerStream pipeServer =
-                new AnonymousPipeServerStream(PipeDirection.In,
-                HandleInheritability.Inheritable))
-            {
-                // Pass the client process a handle to the server.
-                kinectClient2.StartInfo.Arguments =
-                    pipeServer.GetClientHandleAsString();
-                kinectClient2.StartInfo.UseShellExecute = false;
-                kinectClient2.Start();
 
-                pipeServer.DisposeLocalCopyOfClientHandle();
-
-                try
-                {
-                    // Read user input and send that to the client process.
-                    using (StreamWriter sw = new StreamWriter(pipeServer))
-                    {
-                        sw.AutoFlush = true;
-                        // Send a 'sync message' and wait for client to receive it.
-                        sw.WriteLine("SYNC");
-                        pipeServer.WaitForPipeDrain();
-                        // Send the console input to the client process.
-                        Console.Write("[SERVER] Enter text: ");
-                        sw.WriteLine(Console.ReadLine());
-                    }
-                }
-                // Catch the IOException that is raised if the pipe is broken
-                // or disconnected.
-                catch (IOException e)
-                {
-                    Console.WriteLine("[SERVER] Error: {0}", e.Message);
-                }
-            }
         }
 
         /// <summary>
@@ -85,21 +53,24 @@ namespace _2Kinects1Machine
         protected override void Initialize()
         {
             //initialize process variables
-            kinectClient1 = new Process();
-            kinectClient2 = new Process();
+            //kinectClient1 = new Process();
+            //kinectClient2 = new Process();
 
             //DEBUG: Rename once Client Class is handled.
             //run the client process
-            kinectClient1.StartInfo.FileName = "pipeClient.exe";
-            kinectClient2.StartInfo.FileName = "pipeClient.exe";
+            //kinectClient1.StartInfo.FileName = "pipeClient.exe";
+            //kinectClient2.StartInfo.FileName = "pipeClient.exe";
 
             //Make new threads to support pipes between the servers and clients
-            Thread KinectThread1 = new Thread(new ParameterizedThreadStart(pipeFromClient));
-            Thread KinectThread2 = new Thread(new ParameterizedThreadStart(pipeFromClient));
+            Console.WriteLine("Spawning server");
+            ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", 0);
+            Thread KinectThread1 = new Thread(new ThreadStart(server.ThreadProc));
+            //Thread KinectThread2 = new Thread(new ParameterizedThreadStart(pipeFromClient));
 
             //Start the pipe thread with the kinect processes
-            KinectThread1.Start(kinectClient1);
-            KinectThread2.Start(kinectClient2);
+            //KinectThread1.Start(kinectClient1);
+            //KinectThread2.Start(kinectClient2);
+            KinectThread1.Start();
 
 
             base.Initialize();

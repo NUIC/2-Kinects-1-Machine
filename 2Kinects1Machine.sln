@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2Kinects1Machine", "2Kinect
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2Kinects1MachineContent", "2Kinects1MachineContent\2Kinects1MachineContent.contentproj", "{713D33E7-C250-477A-80BA-68E4F051638B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectClient", "KinectClient\KinectClient.csproj", "{5AD18358-BCE0-4643-BE6F-FEC1821B6827}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -17,6 +19,10 @@ Global
 		{C1D9FFB3-BF87-4835-B215-615D40A92CA8}.Release|x86.Build.0 = Release|x86
 		{713D33E7-C250-477A-80BA-68E4F051638B}.Debug|x86.ActiveCfg = Debug|x86
 		{713D33E7-C250-477A-80BA-68E4F051638B}.Release|x86.ActiveCfg = Release|x86
+		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Debug|x86.ActiveCfg = Debug|x86
+		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Debug|x86.Build.0 = Debug|x86
+		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Release|x86.ActiveCfg = Release|x86
+		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
