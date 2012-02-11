@@ -12,6 +12,9 @@ using System.Runtime.Serialization;
 
 namespace KinectClient
 {
+    /// <summary>
+    /// 
+    /// </summary>
     class KinectClient
     {
         // The client pipestream for sending SkeletonData to the parent
@@ -175,26 +178,20 @@ namespace KinectClient
 
             try
             {
-                // Read user input and send that to the client process.
-                using (StreamReader sr = new StreamReader(pipeServer))
+                Console.WriteLine("[Server] Waiting for skeleton data");
+
+                while (pipeServer.IsConnected)
                 {
-                    //char temp;
-                    //string message = "";
-                    Console.WriteLine("[Server] Waiting for skeleton data");
+                    BinaryFormatter formatter = new BinaryFormatter();
 
-                    while (pipeServer.IsConnected)
+                    try
                     {
-                        BinaryFormatter formatter = new BinaryFormatter();
-
-                        try
-                        {
-                            skeletonData = (Skeleton[])formatter.Deserialize(pipeServer);
-                            Console.WriteLine("[Server] Found a skeleton with ID: {0}", skeletonData[0].TrackingId);
-                        }
-                        catch (SerializationException e)
-                        {
-                            Console.WriteLine("[Server] Exception: {0}", e.Message);
-                        }
+                        skeletonData = (Skeleton[])formatter.Deserialize(pipeServer);
+                        Console.WriteLine("[Server] Found a skeleton with ID: {0}", skeletonData[0].TrackingId);
+                    }
+                    catch (SerializationException e)
+                    {
+                        Console.WriteLine("[Server] Exception: {0}", e.Message);
                     }
                 }
             }
