@@ -23,16 +23,18 @@ namespace _2Kinects1Machine
     {
         //remove these two after tech demo
         GraphicsDeviceManager graphics;
+
+
+        SocketServerClass serv;
+
         // SpriteBatch spriteBatch;
         //-----------------------------------
-
-       Process kinectClient1;
-       Process kinectClient2;
 
         public MultinectServer()
         {
             //remove this after tech demo
             graphics = new GraphicsDeviceManager(this);
+            serv = new SocketServerClass();
         }
 
         /// <summary>
@@ -62,6 +64,11 @@ namespace _2Kinects1Machine
             //kinectClient2.StartInfo.FileName = "pipeClient.exe";
 
             //Make new threads to support pipes between the servers and clients
+
+
+            //BELOW HAS  BEEN COMMENTED OUT. UN COMMENT AFTER TECH DEMO.
+
+            /*
             Console.WriteLine("Spawning server");
             ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", 0);
             Thread KinectThread1 = new Thread(new ThreadStart(server.ThreadProc));
@@ -69,6 +76,8 @@ namespace _2Kinects1Machine
 
             //Start the pipe thread with the kinect processes
             KinectThread1.Start();
+            */
+
 
 
             base.Initialize();
@@ -82,7 +91,12 @@ namespace _2Kinects1Machine
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
+            //polling socket here. data returned will be a byte array. Figure out what to do with it here. Should just be an int?
+            serv.pollSocket();
+
+
+
+
 
             base.Update(gameTime);
         }
