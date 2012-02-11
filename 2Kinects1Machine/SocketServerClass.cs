@@ -7,6 +7,8 @@ using System.IO;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
+using Microsoft.Kinect;
 
 namespace _2Kinects1Machine
 {
@@ -18,7 +20,7 @@ namespace _2Kinects1Machine
 
         public SocketServerClass()
         {
-   
+            ThreadProc();
         }
 
         public void ThreadProc()
@@ -55,15 +57,26 @@ namespace _2Kinects1Machine
             }
         }
 
-        public byte[] pollSocket()
+        public Skeleton[] pollSocket()
         {
-            byte[] receiveBuffer = new byte[4096];
+            BinaryFormatter formatter = new BinaryFormatter();
+            Skeleton[] skeletonData;
 
-            Console.WriteLine("Recieving Data");
-            clientSocket.Receive(receiveBuffer);
-            Console.WriteLine("Data Recieved");
-            
-            return receiveBuffer;
+            NetworkStream n = new NetworkStream(serverSocket);
+
+
+            try
+            {
+                skeletonData = (Skeleton[])formatter.Deserialize(n);
+                Console.WriteLine("[Server] Found a skeleton with ID: {0}", skeletonData[0].TrackingId);
+                Console.WriteLine("Data Recieved");
+                return skeletonData;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[Stream] Exception: {0}", e.Message);
+            }
+            return null;
         }
     }
 }
