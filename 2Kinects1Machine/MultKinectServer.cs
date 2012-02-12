@@ -60,20 +60,23 @@ namespace _2Kinects1Machine
         {
             if (KinectSensor.KinectSensors.Count > 0)
             {
-
-
                 foreach (KinectSensor sensor in KinectSensor.KinectSensors)
                 {
                     if (sensor.Status == KinectStatus.Connected)
                     {
                         ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", sensor.UniqueKinectId);
-                        Thread KinectThread = new Thread(new ThreadStart(server.ThreadProc));
-                        threads.Add(KinectThread);
+                        Thread kinectThread = new Thread(new ThreadStart(server.ThreadProc));
+                        threads.Add(kinectThread);
 
-                        KinectThread.Start();
+                        kinectThread.Start();
                     }
                 }
             }
+
+            SocketServerClass socketServer = new SocketServerClass();
+            Thread socketThread = new Thread(new ThreadStart(socketServer.ThreadProc));
+            threads.Add(socketThread);
+            socketThread.Start();
 
             //initialize process variables
             //kinectClient1 = new Process();
