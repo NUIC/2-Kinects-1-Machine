@@ -10,7 +10,7 @@ namespace _2Kinects1Machine
         /// </summary>
         static void Main(string[] args)
         {
-            using (MultinectServer game = new MultinectServer())
+            using (MultKinectServer game = new MultKinectServer())
             {
                 game.Run();
             }

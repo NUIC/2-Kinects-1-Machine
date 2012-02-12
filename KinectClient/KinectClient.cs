@@ -11,7 +11,9 @@ namespace KinectClient
         protected KinectSensor sensor;
         protected Skeleton[] skeletonData;
 
-        // 
+        /// <summary>
+        /// 
+        /// </summary>
         protected TransformSmoothParameters smoothingParameters = new TransformSmoothParameters {
             Smoothing = 0.1f,
             Correction = 0.0f,

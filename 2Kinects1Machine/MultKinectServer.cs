@@ -20,7 +20,7 @@ namespace _2Kinects1Machine
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class MultinectServer : Microsoft.Xna.Framework.Game
+    public class MultKinectServer : Microsoft.Xna.Framework.Game
     {
         //remove these two after tech demo
         GraphicsDeviceManager graphics;
@@ -33,7 +33,7 @@ namespace _2Kinects1Machine
         // SpriteBatch spriteBatch;
         //-----------------------------------
 
-        public MultinectServer()
+        public MultKinectServer()
         {
             //remove this after tech demo
             graphics = new GraphicsDeviceManager(this);
@@ -114,11 +114,6 @@ namespace _2Kinects1Machine
 
             //polling socket here. data returned will be a byte array. Figure out what to do with it here. Should just be an int?
             //serv.pollSocket();
-
-
-
-
-
             base.Update(gameTime);
         }
 

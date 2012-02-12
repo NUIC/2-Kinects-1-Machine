@@ -48,9 +48,7 @@ namespace _2Kinects1Machine
 
             finally
             {
-                
                     serverSocket.Close();
-                
             }
         }
 
