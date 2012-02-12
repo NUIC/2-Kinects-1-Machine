@@ -12,50 +12,30 @@ using Microsoft.Kinect;
 
 namespace _2Kinects1Machine
 {
-    class SocketServerClass
+    class TCPServerClass
     {
-        //SocketInformation socketInfo;
-        //Socket serverSocket;// = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); 
-        //Socket clientSocket;
-
-
-        public SocketServerClass()
-        {
-            //Socket socket = new Socket();
-            //socketInfo = new SocketInformation();
-            //socketInfo.Options = new SocketInformationOptions {
-                
-            //};
-            //ThreadProc();
-        }
+        public event EventHandler<SkeletonReadyEventArgs> skeletonEvents;
 
         public void ThreadProc()
         {
             try
             {
-                //Socket serverSocket = new Socket(/*AddressFamily.InterNetwork*/ AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                //IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
+                // Get the IP address
                 IPAddress ipAddress = IPAddress.Parse("192.168.2.2");
 
+                // Create and start the listener
                 TcpListener listener = new TcpListener(ipAddress, 5300);
                 listener.Start();
 
-                // Create ip-endpoint
-                //IPEndPoint localEndPoint = new IPEndPoint (ipAddress, 5300);
-                //// Bind to local IP Address...
-                //Console.WriteLine("[Server] New socket opened on port 5300");
-                //serverSocket.Bind( localEndPoint );
-				// Start listening...
                 Console.WriteLine("[Server] Listening for Client Socket");
-                //serverSocket.Listen(1);
-                //Socket clientSocket = serverSocket.Accept();
+
+                // Waiting for a TCP Client
                 TcpClient client = listener.AcceptTcpClient();
                 Console.WriteLine("[Server] Client Socket Accepted");
 
+                // Get the skeleton data while the client is connected
                 while(client.Connected) {
-                //Get a network stream
-                    //NetworkStream networkStream = new NetworkStream(clientSocket);
+
                     BinaryFormatter formatter = new BinaryFormatter();
 
                     Skeleton[] skeletonData = (Skeleton[]) formatter.Deserialize(client.GetStream());
@@ -64,44 +44,24 @@ namespace _2Kinects1Machine
                     {
                         if (s.TrackingState == SkeletonTrackingState.Tracked)
                         {
-                            Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
+                            //Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
+                            OnSkeletonTracked(new SkeletonReadyEventArgs(s));
                         }
                     }
                 }
-
             }
-            // Catch the Exception that is raised if the socket is broken
-            // or disconnected.
             catch (SocketException e)
             {
                 Console.WriteLine("Server: Socket error occurred: {0}", e.Message);
             }
-
-            //finally
-            //{
-            //        serverSocket.Close();
-            //}
         }
 
-        //public Skeleton[] pollSocket()
-        //{
-        //    BinaryFormatter formatter = new BinaryFormatter();
-        //    Skeleton[] skeletonData;
-
-        //    NetworkStream n = new NetworkStream(serverSocket);
-
-        //    try
-        //    {
-        //        skeletonData = (Skeleton[])formatter.Deserialize(n);
-        //        Console.WriteLine("[Server] Found a skeleton with ID: {0}", skeletonData[0].TrackingId);
-        //        Console.WriteLine("Data Recieved");
-        //        return skeletonData;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine("[Stream] Exception: {0}", e.Message);
-        //    }
-        //    return null;
-        //}
+        void OnSkeletonTracked(SkeletonReadyEventArgs e)
+        {
+            if (skeletonEvents != null)
+            {
+                skeletonEvents(this, e);
+            }
+        }
     }
 }

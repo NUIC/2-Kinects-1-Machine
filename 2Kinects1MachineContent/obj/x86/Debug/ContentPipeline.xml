@@ -7,15 +7,15 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Users\Chase\gitrepos\2-Kinects-1-Machine\2Kinects1MachineContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\Chase\gitrepos\2-Kinects-1-Machine\2Kinects1Machine\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\Chase\gitrepos\2-Kinects-1-Machine\2Kinects1MachineContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\Chase\gitrepos\2-Kinects-1-Machine\2Kinects1Machine\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>D:\git\2KinectTechDemo\2Kinects1MachineContent\</RootDirectory>
+      <LoggerRootDirectory>D:\git\2KinectTechDemo\2Kinects1Machine\</LoggerRootDirectory>
+      <IntermediateDirectory>D:\git\2KinectTechDemo\2Kinects1MachineContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>D:\git\2KinectTechDemo\2Kinects1Machine\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
         <Key>C:\Windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
-        <Value>2011-08-18T13:07:46.309211-04:00</Value>
+        <Value>2011-08-18T00:36:32.2575852-04:00</Value>
       </Assembly>
     </Assemblies>
   </Asset>

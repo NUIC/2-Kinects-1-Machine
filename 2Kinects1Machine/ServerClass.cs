@@ -8,13 +8,18 @@ using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using Microsoft.Kinect;
+using System.Threading;
 
 namespace _2Kinects1Machine
 {
+    public delegate void SkeletonTracked(object sender, EventArgs e);
+
     class ServerClass
     {
         private string clientProcess;
         private string kinectId;
+
+        public event EventHandler<SkeletonReadyEventArgs> skeletonEvents;
 
         public ServerClass(string client, string kid)
         {
@@ -42,11 +47,6 @@ namespace _2Kinects1Machine
 
             try
             {
-                //// Read user input and send that to the client process.
-                //using (StreamReader sr = new StreamReader(pipeServer))
-                //{
-                //    char temp;
-                //    string message = "";
                 Console.WriteLine("[Server] Ready for Skeleton data");
                 BinaryFormatter formatter = new BinaryFormatter();
 
@@ -61,7 +61,8 @@ namespace _2Kinects1Machine
                         {
                             if (s.TrackingState == SkeletonTrackingState.Tracked)
                             {
-                                Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
+                             //   Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
+                                AssignSkeleton(s);
                             }
                         }
                     }
@@ -70,13 +71,41 @@ namespace _2Kinects1Machine
                         Console.WriteLine("[Server] Exception: {0}", e.Message);
                     }
                 }
-                //}
             }
-            // Catch the IOException that is raised if the pipe is broken
-            // or disconnected.
             catch (IOException e)
             {
                 Console.WriteLine("[SERVER-Thread1] Error: {0}", e.Message);
+            }
+        }
+
+        void AssignSkeleton(Skeleton skeleton)
+        {
+            Mutex[] gm = { MultKinectServer.playerList };
+            Mutex.WaitAll(gm, 40);
+
+            if (MultKinectServer.players.Count == 0)
+            {
+
+                MultKinectServer.players.Add(skeleton);
+                gm[0].ReleaseMutex();
+                return;
+            }
+
+            for (int i = 0; i < MultKinectServer.players.Count; i++)
+            {
+                if (MultKinectServer.players[i].TrackingId.Equals(skeleton))
+                {
+
+                    MultKinectServer.players[i] = skeleton;
+                    gm[0].ReleaseMutex();
+                    return;
+                }
+            }
+
+            if (MultKinectServer.players.Count < 4)
+            {
+                MultKinectServer.players.Add(skeleton);
+                gm[0].ReleaseMutex();
             }
         }
     }

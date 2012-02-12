@@ -14,6 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Kinect;
+using System.Runtime.InteropServices;
 
 namespace _2Kinects1Machine
 {
@@ -22,23 +23,38 @@ namespace _2Kinects1Machine
     /// </summary>
     public class MultKinectServer : Microsoft.Xna.Framework.Game
     {
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern uint MessageBox(IntPtr hWnd, String text, String caption, uint type);
+
+        Texture2D blank;
+
         //remove these two after tech demo
         GraphicsDeviceManager graphics;
 
-
-        SocketServerClass serv;
+        TCPServerClass serv;
         //List<ServerClass> servers;
         List<Thread> threads;
 
-        // SpriteBatch spriteBatch;
-        //-----------------------------------
+        internal static Mutex playerList = new Mutex(false);
+        internal static List<Skeleton> players = new List<Skeleton>();
+
+        SpriteBatch spriteBatch;
 
         public MultKinectServer()
         {
-            //remove this after tech demo
             graphics = new GraphicsDeviceManager(this);
             threads = new List<Thread>();
-            //serv = new SocketServerClass();
+            players = new List<Skeleton>();
+            playerList = new Mutex(false);
+        }
+
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            blank = new Texture2D(graphics.GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            blank.SetData(new[] { Color.White });
+
+            base.LoadContent();
         }
 
         /// <summary>
@@ -47,6 +63,38 @@ namespace _2Kinects1Machine
         /// </summary>
         protected void pipeFromClient(Process kinect)
         {
+
+        }
+
+        void SkeletonDataReady(object sender, SkeletonReadyEventArgs args)
+        {
+            Mutex[] gm = {playerList};
+            Mutex.WaitAll(gm, 40);
+
+            if (players.Count == 0)
+            {
+                
+                players.Add(args.getSkeleton());
+                gm[0].ReleaseMutex();
+                return;
+            }
+
+            for (int i = 0; i < players.Count; i++ )
+            {
+                if (players[i].TrackingId.Equals(args.getSkeleton()))
+                {
+
+                    players[i] = args.getSkeleton();
+                    gm[0].ReleaseMutex();
+                    return;
+                }
+            }
+
+            if (players.Count < 4)
+            {
+                players.Add(args.getSkeleton());
+                gm[0].ReleaseMutex();
+            }
 
         }
 
@@ -65,6 +113,7 @@ namespace _2Kinects1Machine
                     if (sensor.Status == KinectStatus.Connected)
                     {
                         ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", sensor.UniqueKinectId);
+                        server.skeletonEvents += SkeletonDataReady;
                         Thread kinectThread = new Thread(new ThreadStart(server.ThreadProc));
                         threads.Add(kinectThread);
 
@@ -73,36 +122,12 @@ namespace _2Kinects1Machine
                 }
             }
 
-            SocketServerClass socketServer = new SocketServerClass();
+            // Open a 
+            TCPServerClass socketServer = new TCPServerClass();
+            socketServer.skeletonEvents += SkeletonDataReady;
             Thread socketThread = new Thread(new ThreadStart(socketServer.ThreadProc));
             threads.Add(socketThread);
             socketThread.Start();
-
-            //initialize process variables
-            //kinectClient1 = new Process();
-            //kinectClient2 = new Process();
-
-            //DEBUG: Rename once Client Class is handled.
-            //run the client process
-            //kinectClient1.StartInfo.FileName = "pipeClient.exe";
-            //kinectClient2.StartInfo.FileName = "pipeClient.exe";
-
-            //Make new threads to support pipes between the servers and clients
-
-
-            //BELOW HAS  BEEN COMMENTED OUT. UN COMMENT AFTER TECH DEMO.
-
-            /*
-            Console.WriteLine("Spawning server");
-            ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", 0);
-            Thread KinectThread1 = new Thread(new ThreadStart(server.ThreadProc));
-            //Thread KinectThread2 = new Thread(new ParameterizedThreadStart(pipeFromClient));
-
-            //Start the pipe thread with the kinect processes
-            KinectThread1.Start();
-            */
-
-
 
             base.Initialize();
         }
@@ -115,8 +140,6 @@ namespace _2Kinects1Machine
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            //polling socket here. data returned will be a byte array. Figure out what to do with it here. Should just be an int?
-            //serv.pollSocket();
             base.Update(gameTime);
         }
 
@@ -129,9 +152,90 @@ namespace _2Kinects1Machine
             //black is lame. Let's use something longer. LightGoldenrodYellow
             GraphicsDevice.Clear(Color.DarkSlateGray);
 
+            Mutex[] gm = { playerList };
+            Mutex.WaitAll(gm, 40);
+
+            foreach (Skeleton s in players)
+            {
+                drawSkeleton(s);
+            }
+            gm[0].ReleaseMutex();
+
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        private void addLine(Joint joint, Joint joint_2)
+        {
+
+            DrawLine(this.spriteBatch, blank, 3, Color.Yellow, new Vector2(joint.Position.X * (-150) + 400, joint.Position.Y * (-150) + 400), new Vector2(joint_2.Position.X * (-150) + 400, joint_2.Position.Y * (-150) + 400));
+
+        }
+
+        void DrawLine(SpriteBatch batch, Texture2D blank,
+              float width, Color color, Vector2 point1, Vector2 point2)
+        {
+            float angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            float length = Vector2.Distance(point1, point2);
+
+            batch.Draw(blank, point1, null, color,
+                       angle, Vector2.Zero, new Vector2(length, width),
+                       SpriteEffects.None, 0);
+
+        }
+
+        void drawSkeleton(Skeleton skeleton)
+        {
+            spriteBatch.Begin();
+
+            if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
+            {
+                Joint headJoint = skeleton.Joints[JointType.Head];
+                Joint hipCenter = skeleton.Joints[JointType.HipCenter];
+
+                if (headJoint.TrackingState != JointTrackingState.NotTracked)
+                {
+                    SkeletonPoint headPosition = headJoint.Position;
+
+                    //HeadPositionPrintline wrecks code efficiency!!!
+                    //Console.WriteLine(skeleton.Joints[JointType.Head].Position.Y);
+
+                    // Spine
+                    addLine(skeleton.Joints[JointType.Head], skeleton.Joints[JointType.ShoulderCenter]);
+                    addLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.Spine]);
+
+                    // Left leg
+                    addLine(skeleton.Joints[JointType.Spine], skeleton.Joints[JointType.HipCenter]);
+                    addLine(skeleton.Joints[JointType.HipCenter], skeleton.Joints[JointType.HipLeft]);
+                    addLine(skeleton.Joints[JointType.HipLeft], skeleton.Joints[JointType.KneeLeft]);
+                    addLine(skeleton.Joints[JointType.KneeLeft], skeleton.Joints[JointType.AnkleLeft]);
+                    addLine(skeleton.Joints[JointType.AnkleLeft], skeleton.Joints[JointType.FootLeft]);
+
+                    // Right leg
+                    addLine(skeleton.Joints[JointType.HipCenter], skeleton.Joints[JointType.HipRight]);
+                    addLine(skeleton.Joints[JointType.HipRight], skeleton.Joints[JointType.KneeRight]);
+                    addLine(skeleton.Joints[JointType.KneeRight], skeleton.Joints[JointType.AnkleRight]);
+                    addLine(skeleton.Joints[JointType.AnkleRight], skeleton.Joints[JointType.FootRight]);
+
+                    // Left arm
+                    addLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.ShoulderLeft]);
+                    addLine(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft]);
+                    addLine(skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.WristLeft]);
+                    addLine(skeleton.Joints[JointType.WristLeft], skeleton.Joints[JointType.HandLeft]);
+
+                    // Right arm
+                    addLine(skeleton.Joints[JointType.ShoulderCenter], skeleton.Joints[JointType.ShoulderRight]);
+                    addLine(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight]);
+                    addLine(skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.WristRight]);
+                    addLine(skeleton.Joints[JointType.WristRight], skeleton.Joints[JointType.HandRight]);
+
+                }
+
+
+            }
+            spriteBatch.End();
+
         }
     }
 }
