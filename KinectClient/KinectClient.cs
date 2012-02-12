@@ -10,6 +10,7 @@ namespace KinectClient
     {
         protected KinectSensor sensor;
         protected Skeleton[] skeletonData;
+        protected string kinectId;
 
         /// <summary>
         /// 
@@ -53,6 +54,57 @@ namespace KinectClient
             Console.WriteLine("[Client] Kinect Skeletal stream is enabled: {0}", e.Sensor.SkeletonStream.IsEnabled);
             Console.WriteLine("[Client] Kinect status: {0}", e.Sensor.Status);
             Console.WriteLine("[Client] Kinect device connection ID: {0}", e.Sensor.DeviceConnectionId);
+        }
+
+        public void initKinect() {
+            /**
+                 * Setting up the Kinect
+                 **/
+            if (KinectSensor.KinectSensors.Count > 0)
+            {
+                KinectSensorCollection sensors = KinectSensor.KinectSensors;
+                Console.WriteLine(kinectId);
+                int sensorIndex = GetSensorIndexFromID(kinectId);
+
+
+                sensor = KinectSensor.KinectSensors[sensorIndex];
+                sensor.SkeletonStream.Enable(smoothingParameters);
+                sensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(KinectSkeletonFrameReady);
+                KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(KinectStatusChange);
+                sensor.Start();
+            }
+            else
+            {
+                //throw new Exception("No Kinect sensors found");
+                Console.WriteLine("No Kinect sensors found");
+                while (true) ;
+            }
+
+        }
+
+
+        /// <summary>
+        /// Checks the inputted KinectID and returns its index in the KinectSensorCollection
+        /// </summary>
+        /// <param name="uniqueId">The unique Kinect Id inputed by the parent process</param>
+        /// <returns>The index into the KinectSensorCollection associated with the unique Id</returns>
+        static int GetSensorIndexFromID(string uniqueId)
+        {
+            for (int i = 0; i < KinectSensor.KinectSensors.Count; i++)
+            {
+                // Check to see if the Kinect is connected to the system
+                // Check to see if the Kinect is not already running
+                // Check to see if the UniqueId matches
+                // If all are true return
+                if (KinectSensor.KinectSensors[i].Status == KinectStatus.Connected
+                    && !KinectSensor.KinectSensors[i].IsRunning
+                    && KinectSensor.KinectSensors[i].UniqueKinectId.Equals(uniqueId))
+                {
+                    return i;
+                }
+            }
+
+            throw new Exception("Invalid unique ID");
         }
 
         protected abstract void SendSkeletonData();

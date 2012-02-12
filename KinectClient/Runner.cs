@@ -23,7 +23,9 @@ namespace KinectClient
 #if (DEBUG)
             if (args.Length != 2)
             {
-                SetupParentProcess();
+                //SetupParentProcess();
+                KinectClient client = new KinectClientSocket();
+                client.Start();
             }
 #else
             // We are expecting exactly two arguments (both are required)
@@ -32,8 +34,14 @@ namespace KinectClient
                 throw new Exception("No pipe data passed");
             }
 #endif
-            KinectClient client = new KinectClientPipe(args[0], args[1]);
-            client.Start();
+            else
+                
+            {
+                KinectClient client = new KinectClientPipe(args[0], args[1]);
+                client.Start();
+            }
+
+            
         }
 
 #if (DEBUG)
