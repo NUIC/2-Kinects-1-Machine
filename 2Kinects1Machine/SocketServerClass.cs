@@ -25,24 +25,21 @@ namespace _2Kinects1Machine
 
         public void ThreadProc()
         {
-
-            
-
             try
             {
-                
+                // Create ip-endpoint
 				IPEndPoint ipLocal = new IPEndPoint (IPAddress.Any, 4889);
 				// Bind to local IP Address...
-                Console.WriteLine("New socket opened on port 4889");
+                Console.WriteLine("[Server] New socket opened on port 4889");
 				serverSocket.Bind( ipLocal );
 				// Start listening...
-                Console.WriteLine("Listening for Client Socket");
+                Console.WriteLine("[Server] Listening for Client Socket");
 				serverSocket.Listen (1);
                 clientSocket = serverSocket.Accept();
-                Console.WriteLine("Client Socket Accepted");
+                Console.WriteLine("[Server] Client Socket Accepted");
 
             }
-            // Catch the Socket that is raised if the socket is broken
+            // Catch the Exception that is raised if the socket is broken
             // or disconnected.
             catch (SocketException e)
             {
@@ -63,7 +60,6 @@ namespace _2Kinects1Machine
             Skeleton[] skeletonData;
 
             NetworkStream n = new NetworkStream(serverSocket);
-
 
             try
             {

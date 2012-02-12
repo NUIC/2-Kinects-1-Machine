@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Kinect;
 
 namespace _2Kinects1Machine
 {
@@ -26,6 +27,8 @@ namespace _2Kinects1Machine
 
 
         SocketServerClass serv;
+        //List<ServerClass> servers;
+        List<Thread> threads;
 
         // SpriteBatch spriteBatch;
         //-----------------------------------
@@ -34,7 +37,8 @@ namespace _2Kinects1Machine
         {
             //remove this after tech demo
             graphics = new GraphicsDeviceManager(this);
-            serv = new SocketServerClass();
+            threads = new List<Thread>();
+            //serv = new SocketServerClass();
         }
 
         /// <summary>
@@ -54,6 +58,23 @@ namespace _2Kinects1Machine
         /// </summary>
         protected override void Initialize()
         {
+            if (KinectSensor.KinectSensors.Count > 0)
+            {
+
+
+                foreach (KinectSensor sensor in KinectSensor.KinectSensors)
+                {
+                    if (sensor.Status == KinectStatus.Connected)
+                    {
+                        ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", sensor.UniqueKinectId);
+                        Thread KinectThread = new Thread(new ThreadStart(server.ThreadProc));
+                        threads.Add(KinectThread);
+
+                        KinectThread.Start();
+                    }
+                }
+            }
+
             //initialize process variables
             //kinectClient1 = new Process();
             //kinectClient2 = new Process();
@@ -92,7 +113,7 @@ namespace _2Kinects1Machine
                 this.Exit();
 
             //polling socket here. data returned will be a byte array. Figure out what to do with it here. Should just be an int?
-            serv.pollSocket();
+            //serv.pollSocket();
 
 
 

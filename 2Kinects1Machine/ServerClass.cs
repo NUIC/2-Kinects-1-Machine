@@ -5,15 +5,18 @@ using System.Text;
 using System.IO.Pipes;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using Microsoft.Kinect;
 
 namespace _2Kinects1Machine
 {
     class ServerClass
     {
         private string clientProcess;
-        private int kinectId;
+        private string kinectId;
 
-        public ServerClass(string client, int kid)
+        public ServerClass(string client, string kid)
         {
             this.clientProcess = client;
             this.kinectId = kid;
@@ -30,6 +33,8 @@ namespace _2Kinects1Machine
             childProcess.StartInfo.Arguments += " " + pipeServer.GetClientHandleAsString();
             childProcess.StartInfo.Arguments += " " + kinectId;
 
+            Console.WriteLine("Setting up Kinect with ID: {0}", KinectSensor.KinectSensors[0].UniqueKinectId);
+
             childProcess.StartInfo.UseShellExecute = false;
             childProcess.Start();
 
@@ -37,28 +42,35 @@ namespace _2Kinects1Machine
 
             try
             {
-                // Read user input and send that to the client process.
-                using (StreamReader sr = new StreamReader(pipeServer))
+                //// Read user input and send that to the client process.
+                //using (StreamReader sr = new StreamReader(pipeServer))
+                //{
+                //    char temp;
+                //    string message = "";
+                Console.WriteLine("[Server] Ready for Skeleton data");
+                BinaryFormatter formatter = new BinaryFormatter();
+
+                Skeleton[] skeletonData;
+
+                while (pipeServer.IsConnected)
                 {
-                    char temp;
-                    string message = "";
-                    Console.WriteLine("[Server] Waiting for input");
-
-                    while (pipeServer.IsConnected)
+                    try
                     {
-                        temp = (char)sr.Read();
-
-                        if (temp != (char)13)
+                        skeletonData = (Skeleton[]) formatter.Deserialize(pipeServer);
+                        foreach (Skeleton s in skeletonData)
                         {
-                            message += temp;
-                        }
-                        else
-                        {
-                            Console.WriteLine("[Server] Echo: {0} ", message);
-                            message = "";
+                            if (s.TrackingState == SkeletonTrackingState.Tracked)
+                            {
+                                Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
+                            }
                         }
                     }
+                    catch (SerializationException e)
+                    {
+                        Console.WriteLine("[Server] Exception: {0}", e.Message);
+                    }
                 }
+                //}
             }
             // Catch the IOException that is raised if the pipe is broken
             // or disconnected.
