@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Style x:Key="option_button" TargetType="Button">
+        <Setter Property="Height" Value="200" />
+        <Setter Property="Width" Value="400" />
+        <Setter Property="VerticalContentAlignment" Value="Bottom" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
+    </Style>
+    
+    <Style x:Key="option_label" TargetType="TextBlock">
+        <Setter Property="Height" Value="75" />
+        <Setter Property="Width" Value="390" />
+        <Setter Property="FontSize" Value="36" />
+        <Setter Property="Padding" Value="10" />
+        <Setter Property="TextAlignment" Value="Right" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+    
+</ResourceDictionary>

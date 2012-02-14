@@ -13,11 +13,13 @@ using System.Threading;
 namespace _2Kinects1Machine
 {
     public delegate void SkeletonTracked(object sender, EventArgs e);
+    
 
     class ServerClass
     {
         private string clientProcess;
         private string kinectId;
+        public Skeleton[] skeletons = new Skeleton[2];
 
         public event EventHandler<SkeletonReadyEventArgs> skeletonEvents;
 
@@ -57,14 +59,46 @@ namespace _2Kinects1Machine
                     try
                     {
                         skeletonData = (Skeleton[]) formatter.Deserialize(pipeServer);
+                        bool update = false;
+                        int numTracked = 0;
                         foreach (Skeleton s in skeletonData)
                         {
                             if (s.TrackingState == SkeletonTrackingState.Tracked)
                             {
-                             //   Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
-                                AssignSkeleton(s);
+                                Console.WriteLine("Tracking skeleton with ID: {0}", s.TrackingId);
+                                //numTracked++;
+                                //Console.WriteLine("[Server] Tracking a skeleton with ID: {0}", s.TrackingId);
+                                //AssignSkeleton(s);
+                                //MultKinectServer.updateSkeleton(s);
+                                
+                                //for (int i = 0; i < skeletons.Length; i++ )
+                                //{
+                                //    if (skeletons[i] == null)
+                                //    {
+                                //        skeletons[i] = s;
+                                //        update = true;
+                                //    }
+
+                                //    if (s.TrackingId == skeletons[i].TrackingId)
+                                //    {
+                                //        skeletons[i] = s;
+                                //        update = true;
+                                //    }
+                                //}
                             }
                         }
+
+                        if (update)
+                        {
+                            MultKinectServer.updateSkeletons(skeletons, kinectId);
+                        }
+
+                        //if (numTracked == 0)
+                        //{
+                        //    Console.WriteLine("Lost skeletons");
+                        //    skeletons[0] = null;
+                        //    skeletons[1] = null;
+                        //}
                     }
                     catch (SerializationException e)
                     {
@@ -83,17 +117,17 @@ namespace _2Kinects1Machine
             Mutex[] gm = { MultKinectServer.playerList };
             Mutex.WaitAll(gm, 40);
 
-            if (MultKinectServer.players.Count == 0)
+            if (MultKinectServer.players.Length == 0)
             {
 
-                MultKinectServer.players.Add(skeleton);
+                MultKinectServer.players[0] = skeleton;
                 gm[0].ReleaseMutex();
                 return;
             }
 
-            for (int i = 0; i < MultKinectServer.players.Count; i++)
+            for (int i = 0; i < MultKinectServer.players.Length; i++)
             {
-                if (MultKinectServer.players[i].TrackingId.Equals(skeleton))
+                if (MultKinectServer.players[i] != null && MultKinectServer.players[i].TrackingId.Equals(skeleton))
                 {
 
                     MultKinectServer.players[i] = skeleton;
@@ -102,9 +136,9 @@ namespace _2Kinects1Machine
                 }
             }
 
-            if (MultKinectServer.players.Count < 4)
+            if (MultKinectServer.players.Length < 4)
             {
-                MultKinectServer.players.Add(skeleton);
+                MultKinectServer.players[MultKinectServer.players.Length] = skeleton;//.Add(skeleton);
                 gm[0].ReleaseMutex();
             }
         }

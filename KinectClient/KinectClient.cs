@@ -36,7 +36,14 @@ namespace KinectClient
                 skeletonData = new Skeleton[e.OpenSkeletonFrame().SkeletonArrayLength];
             }
 
+            
+
             e.OpenSkeletonFrame().CopySkeletonDataTo(skeletonData);
+
+            foreach (Skeleton s in skeletonData)
+            {
+                Console.WriteLine("Tracking skeleton with id: {0}", s.TrackingId);
+            }
 
             this.SendSkeletonData();
         }

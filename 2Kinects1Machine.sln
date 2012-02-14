@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README = README
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectMenu", "KinectUserInterfaceDemo\KinectMenu.csproj", "{76E54701-FEBE-4D06-8AB4-6DC9F0A99C16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,7 +21,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C1D9FFB3-BF87-4835-B215-615D40A92CA8}.Debug|x86.ActiveCfg = Debug|x86
-		{C1D9FFB3-BF87-4835-B215-615D40A92CA8}.Debug|x86.Build.0 = Debug|x86
 		{C1D9FFB3-BF87-4835-B215-615D40A92CA8}.Release|x86.ActiveCfg = Release|x86
 		{C1D9FFB3-BF87-4835-B215-615D40A92CA8}.Release|x86.Build.0 = Release|x86
 		{713D33E7-C250-477A-80BA-68E4F051638B}.Debug|x86.ActiveCfg = Debug|x86
@@ -28,6 +29,10 @@ Global
 		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Debug|x86.Build.0 = Debug|x86
 		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Release|x86.ActiveCfg = Release|x86
 		{5AD18358-BCE0-4643-BE6F-FEC1821B6827}.Release|x86.Build.0 = Release|x86
+		{76E54701-FEBE-4D06-8AB4-6DC9F0A99C16}.Debug|x86.ActiveCfg = Debug|x86
+		{76E54701-FEBE-4D06-8AB4-6DC9F0A99C16}.Debug|x86.Build.0 = Debug|x86
+		{76E54701-FEBE-4D06-8AB4-6DC9F0A99C16}.Release|x86.ActiveCfg = Release|x86
+		{76E54701-FEBE-4D06-8AB4-6DC9F0A99C16}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

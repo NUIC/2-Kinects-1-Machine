@@ -21,7 +21,7 @@ namespace _2Kinects1Machine
             try
             {
                 // Get the IP address
-                IPAddress ipAddress = IPAddress.Parse("192.168.2.2");
+                IPAddress ipAddress = IPAddress.Parse("152.14.240.143");
 
                 // Create and start the listener
                 TcpListener listener = new TcpListener(ipAddress, 5300);

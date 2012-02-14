@@ -1,0 +1,47 @@
+﻿<local:KinectPage x:Class="KinectMenu.Home"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:Controls="clr-namespace:Coding4Fun.Kinect.Wpf.Controls;assembly=Coding4Fun.Kinect.Wpf"
+      xmlns:local="clr-namespace:KinectMenu"
+      mc:Ignorable="d" d:DesignHeight="10080" d:DesignWidth="1920"
+	  Title="Page1">
+
+    <Grid x:Name="theGrid">
+		<Canvas Background="Transparent">
+			<Controls:HoverButton Margin="0" Padding="0" x:Name="kinectLeftButton" ImageSize="64"                                           
+                                ImageSource="/Resources/Hand_Left.png"  TimeInterval="2000"  Canvas.Left="1076" Canvas.Top="175" Panel.ZIndex="1000" />
+            <Controls:HoverButton Margin="0" Padding="0" x:Name="kinectRightButton" ImageSize="64"
+                                  ImageSource="/Resources/Hand_Right.png"
+                                  ActiveImageSource="/Resources/Hand_Right.png"
+                                  TimeInterval="2000" Canvas.Left="1276" Canvas.Top="175" Panel.ZIndex="1000"/>
+
+            <TextBlock Text="Main Menu" Canvas.Left="246" Canvas.Top="175" FontSize="46" Foreground="White" Height="101" Name="textBlock3" Width="824" />
+
+            <Button Style="{StaticResource option_button}" Canvas.Left="246" Canvas.Top="282" Name="new_game" Background="#FFC800" Click="new_game_Click">
+                <TextBlock Style="{StaticResource option_label}">New Game</TextBlock>
+            </Button>
+
+            <Button Style="{StaticResource option_button}" Canvas.Left="670" Canvas.Top="282" Name="load_game" Background="#FF5A0FC8" Click="load_game_Click">
+                <TextBlock Style="{StaticResource option_label}" >Load Game</TextBlock>
+            </Button>
+
+            <Button Style="{StaticResource option_button}" Canvas.Left="246" Canvas.Top="515" Background="#C80FA0" Name="options" Click="options_Click">
+                <TextBlock Style="{StaticResource option_label}">Options</TextBlock>
+            </Button>
+
+            <Button Style="{StaticResource option_button}" Canvas.Left="670" Canvas.Top="515" Background="#26A0DA" Name="quit" Click="quit_Click">
+                <TextBlock Style="{StaticResource option_label}">Quit</TextBlock>
+            </Button>
+        </Canvas>
+        
+        <Image Name="videoImage" Height="240" Width="320" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Image>
+    </Grid>
+    <local:KinectPage.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FF28074E" Offset="0.465" />
+            <GradientStop Color="White" Offset="1" />
+        </LinearGradientBrush>
+    </local:KinectPage.Background>
+</local:KinectPage>

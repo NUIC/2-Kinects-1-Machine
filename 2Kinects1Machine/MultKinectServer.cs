@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Kinect;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace _2Kinects1Machine
 {
@@ -26,6 +27,8 @@ namespace _2Kinects1Machine
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern uint MessageBox(IntPtr hWnd, String text, String caption, uint type);
 
+        public static Dictionary<string, Skeleton[]> skeletonDict;
+
         Texture2D blank;
 
         //remove these two after tech demo
@@ -36,7 +39,7 @@ namespace _2Kinects1Machine
         List<Thread> threads;
 
         internal static Mutex playerList = new Mutex(false);
-        internal static List<Skeleton> players = new List<Skeleton>();
+        internal static Skeleton[] players = new Skeleton[6];
 
         SpriteBatch spriteBatch;
 
@@ -44,8 +47,9 @@ namespace _2Kinects1Machine
         {
             graphics = new GraphicsDeviceManager(this);
             threads = new List<Thread>();
-            players = new List<Skeleton>();
+            //players = new List<Skeleton>();
             playerList = new Mutex(false);
+            skeletonDict = new Dictionary<string, Skeleton[]>();
         }
 
         protected override void LoadContent()
@@ -66,37 +70,36 @@ namespace _2Kinects1Machine
 
         }
 
-        void SkeletonDataReady(object sender, SkeletonReadyEventArgs args)
-        {
-            Mutex[] gm = {playerList};
-            Mutex.WaitAll(gm, 40);
+        //void SkeletonDataReady(object sender, SkeletonReadyEventArgs args)
+        //{
+        //    Mutex[] gm = {playerList};
+        //    Mutex.WaitAll(gm, 40);
 
-            if (players.Count == 0)
-            {
-                
-                players.Add(args.getSkeleton());
-                gm[0].ReleaseMutex();
-                return;
-            }
+        //    if (players.Length == 0)
+        //    {
+        //        players.Add(args.getSkeleton());
+        //        gm[0].ReleaseMutex();
+        //        return;
+        //    }
 
-            for (int i = 0; i < players.Count; i++ )
-            {
-                if (players[i].TrackingId.Equals(args.getSkeleton()))
-                {
+        //    for (int i = 0; i < players.Count; i++ )
+        //    {
+        //        if (players[i].TrackingId.Equals(args.getSkeleton()))
+        //        {
 
-                    players[i] = args.getSkeleton();
-                    gm[0].ReleaseMutex();
-                    return;
-                }
-            }
+        //            players[i] = args.getSkeleton();
+        //            gm[0].ReleaseMutex();
+        //            return;
+        //        }
+        //    }
 
-            if (players.Count < 4)
-            {
-                players.Add(args.getSkeleton());
-                gm[0].ReleaseMutex();
-            }
+        //    if (players.Count < 4)
+        //    {
+        //        players.Add(args.getSkeleton());
+        //        gm[0].ReleaseMutex();
+        //    }
 
-        }
+        //}
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -113,23 +116,60 @@ namespace _2Kinects1Machine
                     if (sensor.Status == KinectStatus.Connected)
                     {
                         ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", sensor.UniqueKinectId);
-                        server.skeletonEvents += SkeletonDataReady;
+
+                        //server.skeletonEvents += SkeletonDataReady;
                         Thread kinectThread = new Thread(new ThreadStart(server.ThreadProc));
                         threads.Add(kinectThread);
-
+                        skeletonDict[sensor.UniqueKinectId] = new Skeleton[2];
                         kinectThread.Start();
                     }
                 }
             }
 
-            // Open a 
-            TCPServerClass socketServer = new TCPServerClass();
-            socketServer.skeletonEvents += SkeletonDataReady;
-            Thread socketThread = new Thread(new ThreadStart(socketServer.ThreadProc));
-            threads.Add(socketThread);
-            socketThread.Start();
+            //// Open a 
+            //TCPServerClass socketServer = new TCPServerClass();
+            ////socketServer.skeletonEvents += SkeletonDataReady;
+            //Thread socketThread = new Thread(new ThreadStart(socketServer.ThreadProc));
+            //threads.Add(socketThread);
+            //socketThread.Start();
 
             base.Initialize();
+        }
+
+        //private static System.Object skeletonLock = new Object();
+        private static int count = 0;
+
+        //[MethodImplAttribute(MethodImplOptions.Synchronized)]
+        internal static void updateSkeleton(Skeleton skeleton)
+        {
+            lock (players)
+            {
+
+                for (int i = 0; i < MultKinectServer.players.Length; i++)
+                {
+                    if (MultKinectServer.players[i] != null && MultKinectServer.players[i].TrackingId.Equals(skeleton))
+                    {
+                        Console.WriteLine("[Server] updating skeleton at position {0}", i);
+                        MultKinectServer.players[i] = skeleton;
+                        return;
+                    }
+                }
+
+                if (count < 4)
+                {
+                    //Console.WriteLine("[Server] assigning skeletong to position {0}", count);
+                    MultKinectServer.players[count++] = skeleton;//.Add(skeleton);
+                }
+            }
+        }
+
+        internal static void updateSkeletons(Skeleton[] skeletons, string key)
+        {
+            lock (skeletonDict)
+            {
+                Console.WriteLine("Updating skeleton");
+                skeletonDict[key] = skeletons;
+            }
         }
 
         /// <summary>
@@ -147,19 +187,28 @@ namespace _2Kinects1Machine
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        //[MethodImplAttribute(MethodImplOptions.Synchronized)]
         protected override void Draw(GameTime gameTime)
         {
             //black is lame. Let's use something longer. LightGoldenrodYellow
             GraphicsDevice.Clear(Color.DarkSlateGray);
 
-            Mutex[] gm = { playerList };
-            Mutex.WaitAll(gm, 40);
+            //Mutex[] gm = { playerList };
+            //Mutex.WaitAll(gm, 40);
 
-            foreach (Skeleton s in players)
+            lock (players)
             {
-                drawSkeleton(s);
+                foreach (Skeleton s in players)
+                {
+                    if (s != null)
+                    {
+                        Console.WriteLine("Drawing");
+                        drawSkeleton(s);
+                    }
+                }
             }
-            gm[0].ReleaseMutex();
+            //gm[0].ReleaseMutex();
+
 
             // TODO: Add your drawing code here
 
@@ -189,8 +238,9 @@ namespace _2Kinects1Machine
         {
             spriteBatch.Begin();
 
-            if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
+            if (skeleton != null && skeleton.TrackingState == SkeletonTrackingState.Tracked)
             {
+                //Console.WriteLine("[Server] Drawing skeletong with id {0}", skeleton.TrackingId);
                 Joint headJoint = skeleton.Joints[JointType.Head];
                 Joint hipCenter = skeleton.Joints[JointType.HipCenter];
 
