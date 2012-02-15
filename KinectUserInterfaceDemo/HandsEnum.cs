@@ -6,6 +6,6 @@ using System.Text;
 namespace KinectMenu
 {
     public enum Hands {
-        Left, Right
+        Left, Right, Right1, Left1
     }
 }

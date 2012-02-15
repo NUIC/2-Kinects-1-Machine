@@ -4,6 +4,10 @@ using System.Windows;
 using Coding4Fun.Kinect.Wpf;
 using Microsoft.Kinect;
 using System.Drawing.Imaging;
+using System.Threading;
+using System.Collections.Generic;
+using Coding4Fun.Kinect.Wpf.Controls;
+using System.Windows.Controls;
 
 namespace KinectMenu
 {
@@ -42,13 +46,20 @@ namespace KinectMenu
             InitializeMotionDetection();
         }
 
+        //public MotionEngine()
+        //{
+        //    InitializeMotionDetection();
+        //}
+
         #endregion Singleton
 
         #region Event Registering / Handling
 
         public delegate void HandMotion(Hands hand, int x, int y);
+        public delegate void HandCreated(HoverButton hand);
 
-        public HandMotion movement;
+        public static HandMotion movement;
+        public static HandCreated created;
 
         public void registerHandMotion(HandMotion handler)
         {
@@ -70,6 +81,11 @@ namespace KinectMenu
             sensor.ColorFrameReady -= handler;
         }
 
+        public void registerHandCreated(HandCreated handler)
+        {
+            created += handler;
+        }
+
 
         #endregion Event Registering / Handling
 
@@ -80,6 +96,8 @@ namespace KinectMenu
         private static Joint rightScaledCursorJoint;
         private static Joint leftScaledCursorJoint;
 
+        private List<Thread> threads;
+
         #endregion Vars
 
         #region Initialization
@@ -89,10 +107,13 @@ namespace KinectMenu
         /// </summary>
         private void InitializeMotionDetection()
         {
+            threads = new List<Thread>();
             InitializeRuntime();
 
-            sensor.SkeletonFrameReady += SkeletonFrameReady;
-            sensor.Start();
+            //sensor.SkeletonFrameReady += SkeletonFrameReady;
+            //sensor.Start();
+
+
         }
 
         protected TransformSmoothParameters smoothingParameters = new TransformSmoothParameters
@@ -104,75 +125,85 @@ namespace KinectMenu
             MaxDeviationRadius = 0.5f
         };
 
+        protected static SkeletonPoint fitToScreen(SkeletonPoint skp)
+        {
+            SkeletonPoint skpResult = new SkeletonPoint { X = skp.X, Y = skp.Y, Z = skp.Z };
+            int screenWidth = 1920;
+            int screenHeight = 1080;
+            skpResult.X *= (screenWidth / -4);
+            skpResult.Y *= (screenHeight / -4);
+            skpResult.X += screenWidth / 2;
+            skpResult.Y += screenHeight / 2;
+            return skpResult;
+        }
+
         private void InitializeRuntime()
         {
-            //sensor.Initialize(RuntimeOptions.UseDepthAndPlayerIndex | Microsoft.Research.Kinect.Nui.RuntimeOptions.UseColor | RuntimeOptions.UseSkeletalTracking);
+            //sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            //sensor.SkeletonStream.Enable(smoothingParameters);
+            //Console.WriteLine("Video stream is open");
 
-            //sensor.SkeletonEngine.TransformSmooth = true;
+            if (KinectSensor.KinectSensors.Count > 0)
+            {
+                foreach (KinectSensor sensor in KinectSensor.KinectSensors)
+                {
+                    if (sensor.Status == KinectStatus.Connected)
+                    {
+                        ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", sensor.UniqueKinectId);
 
-            //Use to transform and reduce jitter
-            //sensor.SkeletonEngine.SmoothParameters = new TransformSmoothParameters
-            //{
-            //    Smoothing = 0.7f,
-            //    Correction = 0.5f,
-            //    Prediction = 0.5f,
-            //    JitterRadius = 0.05f,
-            //    MaxDeviationRadius = 0.04f
-            //};
-
-            //You can adjust the resolution here.
-            //sensor.VideoStream.Open(ImageStreamType.Video, 2, ImageResolution.Resolution640x480, ImageType.ColorYuv);
-            sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-            sensor.SkeletonStream.Enable(smoothingParameters);
-            Console.WriteLine("Video stream is open");
+                        Thread kinectThread = new Thread(new ThreadStart(server.ThreadProc));
+                        threads.Add(kinectThread);
+                        kinectThread.SetApartmentState(ApartmentState.STA);
+                        //skeletonDict[sensor.UniqueKinectId] = new Skeleton[2];
+                        kinectThread.Start();
+                    }
+                }
+            }
         }
 
         #endregion Initialization
 
         #region Motion Detection
 
-        void SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        Dictionary<int, int> handmap = new Dictionary<int, int>();
+        int count = 0;
+
+        internal void SkeletonFrameReady(Skeleton firstPerson)
         {
-            //if (e.OpenSkeletonFrame()Skeletons.Count() == 0) return;
+            int index = 0;
 
-            SkeletonFrame skeletonSet = e.OpenSkeletonFrame();
-            if (skeletonSet == null) return;
-
-            Skeleton[] skeletonData = new Skeleton[skeletonSet.SkeletonArrayLength];
-            skeletonSet.CopySkeletonDataTo(skeletonData);
-
-            if (skeletonData.Length == 0) return;
-
-
-            Skeleton firstPerson = (from s in skeletonData
-                                        where s.TrackingState == SkeletonTrackingState.Tracked
-                                        orderby s.TrackingId descending
-                                        select s).FirstOrDefault();
-            if (firstPerson == null) return;
+            try
+            {
+                index = handmap[firstPerson.TrackingId];
+            }
+            catch (Exception e)
+            {
+                index = count;
+                handmap.Add(firstPerson.TrackingId, count++);
+            }
+            //if (index == 0)
+            //{
+            //    handmap.Add(firstPerson.TrackingId, count++);
+            //}
 
             JointCollection joints = firstPerson.Joints;
 
             Joint rightHand = joints[JointType.HandRight];
             Joint leftHand = joints[JointType.HandLeft];
 
-
             var joinCursorRightHand = rightHand;
             var joinCursorLeftHand = leftHand;
 
-            float rightPosX = 200 * joinCursorRightHand.Position.X + 400;
-            float rightPosY = 200 * joinCursorRightHand.Position.Y + 400;
-
-            float leftPosX = 200 * joinCursorLeftHand.Position.X + 400;
-            float leftPosY = 200 * joinCursorLeftHand.Position.Y + 400;
-
+            joinCursorRightHand.Position = fitToScreen(joinCursorRightHand.Position);
+            joinCursorLeftHand.Position = fitToScreen(joinCursorLeftHand.Position);
 
             rightScaledCursorJoint = new Joint
             {
                 TrackingState = JointTrackingState.Tracked,
                 Position = new SkeletonPoint
                 {
-                    X = rightPosX,
-                    Y = rightPosY,
+                    X = joinCursorRightHand.Position.X,
+                    Y = joinCursorRightHand.Position.Y,
                     Z = joinCursorRightHand.Position.Z
                 }
             };
@@ -181,16 +212,16 @@ namespace KinectMenu
                 TrackingState = JointTrackingState.Tracked,
                 Position = new SkeletonPoint
                 {
-                    X = leftPosX,
-                    Y = leftPosY,
+                    X = joinCursorLeftHand.Position.X,
+                    Y = joinCursorLeftHand.Position.Y,
                     Z = joinCursorLeftHand.Position.Z
                 }
             };
 
             if (movement != null)
             {
-                movement(Hands.Right, (int)rightScaledCursorJoint.Position.X, (int)rightScaledCursorJoint.Position.Y);
-                movement(Hands.Left, (int)leftScaledCursorJoint.Position.X, (int)leftScaledCursorJoint.Position.Y);
+                movement(index != 1 ? Hands.Right : Hands.Right1, (int)rightScaledCursorJoint.Position.X, (int)rightScaledCursorJoint.Position.Y);
+                movement(index != 1 ? Hands.Left : Hands.Left1, (int)leftScaledCursorJoint.Position.X, (int)leftScaledCursorJoint.Position.Y);
             }
         }
 

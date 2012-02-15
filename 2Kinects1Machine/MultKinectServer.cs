@@ -117,7 +117,6 @@ namespace _2Kinects1Machine
                     {
                         ServerClass server = new ServerClass("D:\\git\\2KinectTechDemo\\KinectClient\\bin\\Debug\\KinectClient.exe", sensor.UniqueKinectId);
 
-                        //server.skeletonEvents += SkeletonDataReady;
                         Thread kinectThread = new Thread(new ThreadStart(server.ThreadProc));
                         threads.Add(kinectThread);
                         skeletonDict[sensor.UniqueKinectId] = new Skeleton[2];

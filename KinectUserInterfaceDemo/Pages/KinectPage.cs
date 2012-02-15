@@ -29,8 +29,10 @@ namespace KinectMenu
 
         protected List<Button> buttons;
         protected Image liveVideo;
-        protected HoverButton kinectLeft;
-        protected HoverButton kinectRight;
+        protected static HoverButton kinectLeft;
+        protected static HoverButton kinectRight;
+        protected static HoverButton kinectLeft1;
+        protected static HoverButton kinectRight1;
 
         private MotionEngine motion;
         //private SpeechEngine speech;
@@ -47,6 +49,8 @@ namespace KinectMenu
         {
             Loaded += new RoutedEventHandler(MainWindow_Loaded);
             Unloaded += new RoutedEventHandler(MainWindow_Unloaded);
+
+
         }
 
         /// <summary>
@@ -86,7 +90,7 @@ namespace KinectMenu
 
             //InitializeMotionControl
             motion.registerHandMotion(OnButtonLocationChanged);
-            motion.registerVideoCapture(this.runtime_VideoFrameReady);
+            //motion.registerVideoCapture(this.runtime_VideoFrameReady);
 
 //#if (SPEECH)
 //            speech = SpeechEngine.getInstance();
@@ -118,8 +122,8 @@ namespace KinectMenu
             //SpeechEngine.getInstance().removeSpeechRecognized(this.SpeechRecognized);
             //SpeechEngine.getInstance().removeSpeechRejected(this.SpeechRejected);
 
-            MotionEngine.getInstance().removeHandMotion(this.OnButtonLocationChanged);
-            MotionEngine.getInstance().removeVideoCapture(this.runtime_VideoFrameReady);
+            MotionEngine.getInstance().removeHandMotion(KinectPage.OnButtonLocationChanged);
+            //MotionEngine.getInstance().removeVideoCapture(this.runtime_VideoFrameReady);
         }
 
         #endregion Unloading
@@ -133,19 +137,27 @@ namespace KinectMenu
         /// <param name="movingHand">The hand that is currently moving</param>
         /// <param name="x">The moving hand's current x position</param>
         /// <param name="y">The moving hand's current y position</param>
-        public void OnButtonLocationChanged(Hands movingHand, int x, int y)
+        public static void OnButtonLocationChanged(Hands movingHand, int x, int y)
         {
-            HoverButton hand, otherHand;
+            HoverButton hand;//, otherHand;
 
             if (movingHand == Hands.Right)
             {
                 hand = kinectRight;
-                otherHand = kinectLeft;
+                //otherHand = kinectLeft;
+            }
+            else if (movingHand == Hands.Left)
+            {
+                hand = kinectLeft;
+                //otherHand = kinectRight;
+            }
+            else if (movingHand == Hands.Right1)
+            {
+                hand = kinectRight1;
             }
             else
             {
-                hand = kinectLeft;
-                otherHand = kinectRight;
+                hand = kinectLeft1;
             }
 
 #if (CLAPPING && !HOVER)
@@ -156,23 +168,41 @@ namespace KinectMenu
             } else { hand.Release(); inAction = false; }
 #endif
 
-#if (HOVER && !CLAPPING)
-            if (!inAction && IsButtonOverObject(hand, buttons)) { hand.Hovering(); }
-            else { hand.Release(); inAction = false; }
-#endif
+//#if (HOVER && !CLAPPING)
+            //if (!inAction && IsCursorOverObject(hand, buttons)) { hand.Hovering(); }
+            //else { hand.Release(); inAction = false; }
+//#endif
 
 #if (CLAPPING && HOVER)
-            if (!inAction && IsHandsTogetherOnAButton(hand, otherHand, buttons))
-            {
-                // call the click event of the selected button
-                _selectedButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent, _selectedButton));
-            }
-            else if (!inAction && IsCursorOverObject(hand, buttons)) { hand.Hovering(); }
-            else { hand.Release(); inAction = false; }
+            //if (!inAction && IsHandsTogetherOnAButton(hand, otherHand, buttons))
+            //{
+            //    // call the click event of the selected button
+            //    _selectedButton.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent, _selectedButton));
+            //}
+            //else if (!inAction && IsCursorOverObject(hand, buttons)) { hand.Hovering(); }
+            //else { hand.Release(); inAction = false; }
 #endif
-
-            Canvas.SetLeft(hand, x - (hand.ActualWidth / 2));
-            Canvas.SetTop(hand, y - (hand.ActualHeight / 2));
+                //Canvas.SetLeft(hand, x - (hand.ActualWidth / 2));
+                //hand.Dispatcher.Invoke(new Action(delegate() { hand.
+                object[] param1 = {hand, x - (hand.ActualWidth / 2)};
+                hand.Dispatcher.Invoke(
+                    new Action<HoverButton, double>(
+                        delegate(HoverButton h, double p)
+                        {
+                            Canvas.SetLeft(h, p);
+                        }),
+                    param1
+                );
+                //Canvas.SetTop(hand, y - (hand.ActualHeight / 2));
+                object[] param2 = { hand, y - (hand.ActualHeight / 2) };
+                hand.Dispatcher.Invoke(
+                    new Action<HoverButton, double>(
+                        delegate(HoverButton h, double p)
+                        {
+                            Canvas.SetTop(h, p);
+                        }),
+                    param2
+                );
         }
 
         /// <summary>
@@ -184,22 +214,22 @@ namespace KinectMenu
         public static bool IsCursorOverObject(FrameworkElement hand, List<Button> buttons)
         {
             // get the location of the top left of the hand and then use it to find the middle of the hand
-            //var handTopLeft = new Point(Canvas.GetTop(hand), Canvas.GetLeft(hand));
-            //_handLeft = handTopLeft.X + (hand.ActualWidth / 2);
-            //_handTop = handTopLeft.Y + (hand.ActualHeight / 2);
+            var handTopLeft = new Point(Canvas.GetTop(hand), Canvas.GetLeft(hand));
+            _handLeft = handTopLeft.X + (hand.ActualWidth / 2);
+            _handTop = handTopLeft.Y + (hand.ActualHeight / 2);
 
-            //foreach (Button target in buttons)
-            //{
-            //    Point targetTopLeft = target.PointToScreen(new Point());
-            //    if (_handTop > targetTopLeft.X
-            //        && _handTop < targetTopLeft.X + target.ActualWidth
-            //        && _handLeft > targetTopLeft.Y
-            //        && _handLeft < targetTopLeft.Y + target.ActualHeight)
-            //    {
-            //        _selectedButton = target;
-            //        return true;
-            //    }
-            //}
+            foreach (Button target in buttons)
+            {
+                Point targetTopLeft = target.PointToScreen(new Point());
+                if (_handTop > targetTopLeft.X
+                    && _handTop < targetTopLeft.X + target.ActualWidth
+                    && _handLeft > targetTopLeft.Y
+                    && _handLeft < targetTopLeft.Y + target.ActualHeight)
+                {
+                    _selectedButton = target;
+                    return true;
+                }
+            }
             return false;
         }
 

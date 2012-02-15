@@ -7,7 +7,7 @@ namespace KinectMenu
 
 		public MainWindow()
 		{
-			InitializeComponent();          
+            InitializeComponent();
 		}
     }
 }

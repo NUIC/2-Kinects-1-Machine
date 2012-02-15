@@ -16,11 +16,11 @@ namespace KinectClient
         /// 
         /// </summary>
         protected TransformSmoothParameters smoothingParameters = new TransformSmoothParameters {
-            Smoothing = 0.1f,
+            Smoothing = 0.01f,
             Correction = 0.0f,
             Prediction = 0.0f,
             JitterRadius = 1.0f,
-            MaxDeviationRadius = 0.5f
+            MaxDeviationRadius = 0.25f
         };
 
         /// <summary>
@@ -36,14 +36,9 @@ namespace KinectClient
                 skeletonData = new Skeleton[e.OpenSkeletonFrame().SkeletonArrayLength];
             }
 
-            
-
-            e.OpenSkeletonFrame().CopySkeletonDataTo(skeletonData);
-
-            foreach (Skeleton s in skeletonData)
-            {
-                Console.WriteLine("Tracking skeleton with id: {0}", s.TrackingId);
-            }
+            SkeletonFrame frame = e.OpenSkeletonFrame();
+            frame.CopySkeletonDataTo(skeletonData);
+            frame.Dispose();
 
             this.SendSkeletonData();
         }
@@ -75,7 +70,7 @@ namespace KinectClient
 
 
                 sensor = KinectSensor.KinectSensors[sensorIndex];
-                sensor.SkeletonStream.Enable(smoothingParameters);
+                sensor.SkeletonStream.Enable(/*smoothingParameters*/);
                 sensor.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(KinectSkeletonFrameReady);
                 KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(KinectStatusChange);
                 sensor.Start();

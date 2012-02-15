@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using Coding4Fun.Kinect.Wpf.Controls;
 
 namespace KinectMenu
 {
@@ -20,13 +21,13 @@ namespace KinectMenu
 
 		protected override void InitializeButtons()
 		{
-			buttons = new List<Button>
-			    {
-			        new_game, 
-					load_game, 
-					options,
-                    quit
-			    };
+            //buttons = new List<Button>
+            //    {
+            //        new_game, 
+            //        load_game, 
+            //        options,
+            //        quit
+            //    };
 		}
 
         protected override void InitializeVideoImage()
@@ -38,6 +39,8 @@ namespace KinectMenu
         {
             kinectLeft = kinectLeftButton;
             kinectRight = kinectRightButton;
+            kinectLeft1 = kinectLeftButton1;
+            kinectRight1 = kinectRightButton1;
         }
 
 		void kinectButton_Clicked(object sender, RoutedEventArgs e)

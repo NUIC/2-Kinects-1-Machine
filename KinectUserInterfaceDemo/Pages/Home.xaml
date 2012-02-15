@@ -11,36 +11,23 @@
     <Grid x:Name="theGrid">
 		<Canvas Background="Transparent">
 			<Controls:HoverButton Margin="0" Padding="0" x:Name="kinectLeftButton" ImageSize="64"                                           
-                                ImageSource="/Resources/Hand_Left.png"  TimeInterval="2000"  Canvas.Left="1076" Canvas.Top="175" Panel.ZIndex="1000" />
+                                ImageSource="/Resources/Hand_Left.png"  TimeInterval="2000"  Canvas.Left="454" Canvas.Top="428" Panel.ZIndex="1000" Height="120" Width="120" />
             <Controls:HoverButton Margin="0" Padding="0" x:Name="kinectRightButton" ImageSize="64"
                                   ImageSource="/Resources/Hand_Right.png"
                                   ActiveImageSource="/Resources/Hand_Right.png"
-                                  TimeInterval="2000" Canvas.Left="1276" Canvas.Top="175" Panel.ZIndex="1000"/>
+                                  TimeInterval="2000" Canvas.Left="302" Canvas.Top="428" Panel.ZIndex="1000" Height="120" Width="120" />
 
-            <TextBlock Text="Main Menu" Canvas.Left="246" Canvas.Top="175" FontSize="46" Foreground="White" Height="101" Name="textBlock3" Width="824" />
+            <Controls:HoverButton Canvas.Left="1228" Canvas.Top="428" ImageSize="64" ImageSource="/Resources/Hand_Left.png" Name="kinectLeftButton1" Padding="0" Panel.ZIndex="1000" TimeInterval="2000" Height="120" Width="120" />
+            <Controls:HoverButton ActiveImageSource="/Resources/Hand_Right.png" Canvas.Left="1444" Canvas.Top="428" ImageSize="64" ImageSource="/Resources/Hand_Right.png" Name="kinectRightButton1" Padding="0" Panel.ZIndex="1000" TimeInterval="2000" Height="120" Width="120" />
 
-            <Button Style="{StaticResource option_button}" Canvas.Left="246" Canvas.Top="282" Name="new_game" Background="#FFC800" Click="new_game_Click">
-                <TextBlock Style="{StaticResource option_label}">New Game</TextBlock>
-            </Button>
-
-            <Button Style="{StaticResource option_button}" Canvas.Left="670" Canvas.Top="282" Name="load_game" Background="#FF5A0FC8" Click="load_game_Click">
-                <TextBlock Style="{StaticResource option_label}" >Load Game</TextBlock>
-            </Button>
-
-            <Button Style="{StaticResource option_button}" Canvas.Left="246" Canvas.Top="515" Background="#C80FA0" Name="options" Click="options_Click">
-                <TextBlock Style="{StaticResource option_label}">Options</TextBlock>
-            </Button>
-
-            <Button Style="{StaticResource option_button}" Canvas.Left="670" Canvas.Top="515" Background="#26A0DA" Name="quit" Click="quit_Click">
-                <TextBlock Style="{StaticResource option_label}">Quit</TextBlock>
-            </Button>
+            <TextBlock Text="Kinect Tech Demo" Canvas.Left="246" Canvas.Top="42" FontSize="72" Foreground="White" Height="164" Name="textBlock3" Width="924" FontWeight="Normal" TextAlignment="Left" />
         </Canvas>
         
         <Image Name="videoImage" Height="240" Width="320" HorizontalAlignment="Right" VerticalAlignment="Bottom"></Image>
     </Grid>
     <local:KinectPage.Background>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-            <GradientStop Color="#FF28074E" Offset="0.465" />
+            <GradientStop Color="#FF2E2E2E" Offset="0.465" />
             <GradientStop Color="White" Offset="1" />
         </LinearGradientBrush>
     </local:KinectPage.Background>
